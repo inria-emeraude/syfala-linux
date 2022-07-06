@@ -2,8 +2,6 @@
 #+date: june 2022
 #+author: Antoine Fraboulet
 
-# Xilinx FPGA Manager and tools
-
 Once the kernel is booted and configured with a correct device-tree
 blob, the FPGA can be updated with new bitstreams using the =fpgautil=
 tool.

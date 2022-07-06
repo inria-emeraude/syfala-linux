@@ -1,4 +1,5 @@
-# Syfala on Xilinx FPGA Boards
+
+* Syfala-Linux on Xilinx FPGA Boards
 
 Syfala-linux has been mainly tested on the Digilent [[https://digilent.com/reference/programmable-logic/zybo-z7/start][Zybo-Z7 boards]], the process
 described in these pages should work on other boards supported by the Xilinx Petalinux

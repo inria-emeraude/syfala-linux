@@ -1,0 +1,16 @@
+# Syfala on Xilinx FPGA Boards
+
+Syfala-linux has been mainly tested on the Digilent [[https://digilent.com/reference/programmable-logic/zybo-z7/start][Zybo-Z7 boards]], the process
+described in these pages should work on other boards supported by the Xilinx Petalinux
+environment.
+
+- [[file:rootfs-petalinux.org][rootfs-petalinux.org]] : petalinux rootfs primer.
+  How to build a virtual machine for petalinux 2020.2, this machine can
+  be also used as a cross-compiling environment for the next step.
+  
+- [[file:xilinx-linux.org][xilinx-linux.org]] : u-boot/linux/device-tree build instructions.
+  Actual platform configuration for platform boot and configuration.
+  
+- [[file:sd-boot.org][sd-boot.org]] : how to setup a bootable SD card for Syfala.
+
+- [[file:fpgamanager.org][fpgamanager.org]] : how to download FPGA bitstream from Linux.

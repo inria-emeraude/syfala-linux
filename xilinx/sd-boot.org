@@ -1,0 +1,100 @@
+#+title: Xilinx Zybo Z7 boot on SD
+#+date: june 2022
+#+author: Antoine Fraboulet
+
+Booting from an SD card requires several steps.
+- media preparation
+- software configuration and copying files on media  
+- hardware configuration
+  
+* bootable sd card preparation
+
+Some notes and a Howto are available on the Xilinx  [[https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842385/How+to+format+SD+card+for+SD+boot][Xilinx wiki notes]]
+
+Your SD card should contain 2 partitions, one using VFAT format that
+will contain the boot binaries up to (including) the linux kernel. The
+other partition being your rootfs.
+
+#+name partition table
+#+begin_example
+   sdx1 Bootable 200M Id=c "W95 FAT32 (LBA)" name=boot ; vfat
+   sdx2          +xxG Id=83 "Linux"          name=root ; ext4
+#+end_example
+
+formatting partitions:
+#+begin_src sh
+  mkfs.vfat -F 32 -n boot /dev/sdx1
+  mkfs.ext4 -m 0 -L root  /dev/sdx2
+ #+end_src
+
+** boot binaries and configuration
+
+The first partition must contain the first stage boot loader (fsbl)
+which *must* be named =boot.bin= (upper/lower case doesn't matter). This
+FSBL will then start =u-boot=.
+
+=u-boot= can be used to configure the platform and start a kernel using
+complex scripts and advanced features (network, multiple media, etc).
+
+We use u-boot to start a simple script called =boot.scr= to boot directly
+from the SD card. This step is done by
+1. loading a kernel in RAM (=uImage= file)
+2. loading a device tree in RAM (=system.dtb= file)
+3. booting from memory using both the preloaded kernel and device-tree.
+   
+The content of the first partition (vfat) should
+almost look like the following example:
+
+#+name SD card content (boot)
+#+begin_src
+     sdx1/
+     ├── boot.bin
+     ├── boot.scr
+     ├── system.dtb
+     ├── u-boot.img
+     └── uImage
+#+end_src
+
+** boot script
+
+The =boot.scr= file can be modified to suit your needs. A boot script
+must be signed with a hash in order to be executed, u-boot won't
+use a script with an incorrect signature (see below).
+
+A minimal boot script should contain at least these lines
+- loading the kernel
+- loading the device tree
+- boot from memory at kernel address:
+
+#+name boot script
+#+begin_example
+  fatload mmc 0:1 0x00200000 uImage;
+  fatload mmc 0:1 0x00e00000 system.dtb;
+  bootm 0x00200000 - 0x00e00000
+  exit;
+#+end_example
+
+In order to sign/hash/build your script, you must include
+=u-boot-xlnx/tools= in your =PATH= to get the =mkimage= tool.  This tool is
+also available as a binary in host distribution but we strongly
+recommend to use the same version as the one used in =u-boot=, otherwise
+some problems might occur concerning modifications and versions of the
+hash signature algorithm.
+  
+#+begin_src sh
+  mkimage -c none -A arm -T script -d boot.cmd.syfala boot.scr
+#+end_src
+
+** rootfs partition and configuration
+
+  The =rootfs= can be configured by mounting the partition and extracting
+  the =rootfs.tar.gz= archive (see [[file:rootfs-petalinux.org][rootfs-petalinux]]).
+
+  #+BEGIN_SRC sh
+    # mount /dev/sdx2 /mnt
+    # cd /mnt/
+    # tar --numeric-owner -xf [path to rootfs.tar.gz]
+    # sync
+    # cd /
+    # umount /mnt
+  #+END_SRC

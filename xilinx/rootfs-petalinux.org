@@ -1,0 +1,123 @@
+#+title: Petalinux virtual machine and rootfs build
+#+date: mai 2022
+#+author: Antoine Fraboulet
+
+This document presents some notes on building a virtual machine
+for Xilinx petalinux builds. This part can be used to build a
+rootfs suited to your needs.
+
+Xilinx Petalinux documentation is available at [[https://docs.xilinx.com/r/2020.2-English/ug1144-petalinux-tools-reference-guide/Introduction][Xilinx ug1144 documentation]].
+
+* VM Setup for Petalinux
+  
+  *Base*
+  Petalinux 2020.2 recommends an Ubuntu 18.04 image. Newer versions of
+  gcc might break the compilation process for Petalinux 2020.2. You can
+  upgrade the Ubuntu image according to your Petalinux version.
+
+  You can select a lightweight image (server image with the openssh server option).
+
+  Once installed a booted you can =update= & =upgrade= your distribution.
+  The following set of packages needs to be installed:
+
+  #+BEGIN_SRC sh
+    # apt update && apt upgrade
+    # apt install gcc  gcc-multilib build-essential dkms linux-headers-generic tftpd
+    # apt install autoconf libtool libncurses-dev texinfo zlib1g-dev zlib1g:i386
+    # apt install git rsync wget curl flex bison libssl-dev
+    # apt install xvfb dbus-x11 xterm
+    #+END_SRC
+
+    Depending on your virtualisation solution
+    - =VBoxLinuxAdditions.run= (Virtual box guest tools)
+
+    Yout have to make sure that the default interpreter is set to =bash=
+
+#+BEGIN_SRC sh
+  # dpkg-reconfigure dash
+  #+END_SRC
+
+
+  
+  *User*
+  Add a user with appropriate groups
+  - adduser syfala vboxsf (virtualbox only)
+  - adduser syfala dialout
+  - adduser syfala staff
+  - set your configuration to *en_US.UTF-8*
+  
+  *Network Configuration*
+  You can select a simple NAT configuration or bridge. No matter the choosen
+  configuration, make sure you can =ssh=  to your vm.
+    
+* Build Petalinux / zybo-z7
+
+  First download the full petalinux archive =petalinux-v2020.2-final-installer.run=
+  Please see notes on 
+  - https://digilent.com/reference/software/petalinux/start
+  - https://docs.xilinx.com/r/2020.2-English/ug1144-petalinux-tools-reference-guide/Design-Flow-Overview
+  To install the petalinux archive.
+  
+  Depending on the installation path you should set a =PETALINUX= environment variable
+  to reference your choice. The following function can be added to you shell.
+
+  #+BEGIN_SRC sh
+    function go_petalinux()
+    {
+            export PETALINUX=${HOME}/Petalinux/2020.2
+            source ${PETALINUX}/settings.sh
+
+            export LC_ALL=en_US.UTF-8
+            export LC_NUMERIC=en_US.UTF-8
+            export PS1="[Petalinux]$PS1"
+    }
+    #+END_SRC
+
+#+BEGIN_SRC sh
+  [Petalinux]$ mkdir oe
+  [Petalinux]$ cd oe
+  [Petalinux]$ petalinux-create -t project -n oe-zynq --template zynq
+  [Petalinux]$ cd oe-zynq 
+  [Petalinux]$ petalinux-config --get-hw-description ${SYFALA}/syfala/build/hw_export/main_wrapper.xsa
+  [Petalinux]$ # optional configuration
+  [Petalinux]$ petalinux-build
+  #+END_SRC
+  
+** base configuration (petalinux-config)
+
+   The base configuration has to be modified to boot from the SD card.
+   You must keep the =FPGA Manager= option "on" and change the =Image Packaging Configuration=
+   to select a SD Root filesystem.
+
+  #+begin_example
+    [x] Subsystem AUTO Hardware Settings -->
+        FPGA Manager -->
+          [x] Fpga Manager
+        Image Packaging Configuration -->
+          Rootfilesystem type (EXT4 (SD/eMMC/SATA/USB)) -->
+          (/dev/mmcblk0p2) Device node of SD device
+          (image.ub) name for bootable kernel image
+          (tar.gz) Root filesystem formats
+          (0x1000) DTB padding size
+          [ ] copy final images to tftpboot
+        Firmware Version Configuration -->
+          (oe-zynq) Host name
+          (oe-zynq) Product name
+          (1.00) Firmware version
+        Yocto Settings -->
+          (zybo-zynq7) YOCTO_MACHINE_NAME
+          Parallel thread execution -->
+             (4) sets number of bb threads (BB_NUMBER_THREADS)
+             (4) sets number of parallel make -j (PARALLEL_MAKE)
+#+end_example
+
+  Embedded tools and applications can be selected using the
+  =petalinux-config -c roots= build target. You can include a native
+  gcc/make toolchain with almost any library to build embedded
+  applications.
+
+  The image must be rebuild using the =petalinux-build= command.
+
+  =BB_NUMBER_THREADS= and =PARALLEL_MAKE= are used by bitbake (the build
+  engine behind petalinux/yocto) and can be set according to your
+  build platform.

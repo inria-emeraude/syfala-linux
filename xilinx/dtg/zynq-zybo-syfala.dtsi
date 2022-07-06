@@ -1,0 +1,40 @@
+
+/ {
+        model = "Digilent Zybo Z7 board";
+        compatible = "digilent,zynq-zybo-z7", "xlnx,zynq-7000";
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x40000000>;
+	};
+
+       aliases {
+                ethernet0 = &gem0;
+                serial0 = &uart1;
+        };
+
+	chosen {
+		bootargs = "earlycon uio_pdrv_genirq.of_id=generic-uio root=/dev/mmcblk0p2 rootfstype=ext4 rw rootwait";
+	};
+	
+};
+
+&sdhci0 {
+        status = "okay";
+};
+
+&gem0 {
+        status = "okay";
+        phy-mode = "rgmii-id";
+        phy-handle = <&ethernet_phy>;
+
+        ethernet_phy: ethernet-phy@0 {
+                reg = <0>;
+                device_type = "ethernet-phy";
+        };
+};
+
+&faust_v6_0 {
+        compatible = "generic-uio";
+};
+

@@ -1,0 +1,12 @@
+#!/bin/env bash
+
+if [ "x${PETALINUX}" = "x" ] ; then 
+	echo "make sure to setup petalinux sources before that script"
+else
+	export CROSS_COMPILE=arm-none-eabi-
+	export ARCH=arm
+	export PATH=${PETALINUX}/tools/xsct/bin:${PATH}
+	export PATH=${HOME}/syfala/boot/u-boot-xlnx/tools:${PATH}
+	export PATH=${HOME}/syfala/boot/dtc:${PATH}
+	export PS1="[X]$PS1"
+fi

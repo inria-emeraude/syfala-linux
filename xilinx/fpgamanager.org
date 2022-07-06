@@ -1,0 +1,47 @@
+#+title: Xilinx FPGA Manager / Linux
+#+date: june 2022
+#+author: Antoine Fraboulet
+
+# Xilinx FPGA Manager and tools
+
+Once the kernel is booted and configured with a correct device-tree
+blob, the FPGA can be updated with new bitstreams using the =fpgautil=
+tool.
+
+=fpgautil= and downloading from Linux requires to use the =bin= bitstream
+format (file that contains only configuration data (it has no header
+as the ".bit" file does).
+
+Converting =bit= to =bin= files can be done using the =fpga-bit-to-bin.py=
+tool available from several sources (see below). A version is included
+in this repo.
+
+#+BEGIN_SRC sh
+  $ ./fpga-bit-to-bin.py -f virtual.bit virtual.bin
+#+END_SRC
+
+=fpgautil= requires root privileges to upload a configuration to the FPGA.
+
+#+BEGIN_SRC sh
+  # fpgautil -b virtual.bin -f Full
+#+END_SRC
+
+** Sources:
+
+Xilinx =fpgautil=
+- [[file:files/fpgautil.c][local copy]] 
+- https://github.com/Xilinx/meta-xilinx-tools/blob/master/recipes-bsp/fpga-manager-script/files/fpgautil.c
+
+=fpga-bit-to-bin.py= is available from several sources
+- [[file:files/fpga-bit-to-bin.py][fpga-bit-to-bin.py local copy]]
+- https://github.com/topic-embedded-products/meta-topic/blob/master/recipes-bsp/fpga/fpga-bit-to-bin/fpga-bit-to-bin.py
+- https://github.com/EttusResearch/uhd/blob/master/mpm/python/usrp_mpm/fpga_bit_to_bin.py
+
+** Documentation:
+
+- Xilinx wiki: https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841645/Solution+Zynq+PL+Programming+With+FPGA+Manager
+- Xilinx file formats: https://support.xilinx.com/s/article/14468?language=en_US
+
+
+
+

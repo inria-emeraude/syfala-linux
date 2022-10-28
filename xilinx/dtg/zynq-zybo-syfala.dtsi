@@ -11,6 +11,7 @@
        aliases {
                 ethernet0 = &gem0;
                 serial0 = &uart1;
+                i2c1 = "/amba/i2c@e0005000";
         };
 
 	chosen {
@@ -20,6 +21,10 @@
 };
 
 &sdhci0 {
+        status = "okay";
+};
+
+&i2c1 {
         status = "okay";
 };
 

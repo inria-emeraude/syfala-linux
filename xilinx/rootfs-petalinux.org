@@ -22,7 +22,7 @@ Xilinx Petalinux documentation is available at [[https://docs.xilinx.com/r/2020.
 
   #+BEGIN_SRC sh
     # apt update && apt upgrade
-    # apt install gcc  gcc-multilib build-essential dkms linux-headers-generic tftpd
+    # apt install gcc gcc-multilib build-essential dkms linux-headers-generic tftpd
     # apt install autoconf libtool libncurses-dev texinfo zlib1g-dev zlib1g:i386
     # apt install git rsync wget curl flex bison libssl-dev
     # apt install xvfb dbus-x11 xterm
@@ -48,9 +48,9 @@ Xilinx Petalinux documentation is available at [[https://docs.xilinx.com/r/2020.
   
   *Network Configuration*
   You can select a simple NAT configuration or bridge. No matter the choosen
-  configuration, make sure you can =ssh=  to your vm.
+  configuration, make sure you can =ssh= to your vm.
     
-* Build Petalinux / zybo-z7
+* Build Petalinux / Zybo-z7
 
   First download the full petalinux archive =petalinux-v2020.2-final-installer.run=
   Please see notes on 
@@ -64,12 +64,12 @@ Xilinx Petalinux documentation is available at [[https://docs.xilinx.com/r/2020.
   #+BEGIN_SRC sh
     function go_petalinux()
     {
-            export PETALINUX=${HOME}/Petalinux/2020.2
-            source ${PETALINUX}/settings.sh
+        export PETALINUX=${HOME}/Petalinux/2020.2
+        source ${PETALINUX}/settings.sh
 
-            export LC_ALL=en_US.UTF-8
-            export LC_NUMERIC=en_US.UTF-8
-            export PS1="[Petalinux]$PS1"
+        export LC_ALL=en_US.UTF-8
+        export LC_NUMERIC=en_US.UTF-8
+        export PS1="[Petalinux]$PS1"
     }
     #+END_SRC
 

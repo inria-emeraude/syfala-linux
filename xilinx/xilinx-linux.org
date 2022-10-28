@@ -9,7 +9,7 @@ external rootfs. Such things can be build using the
 * Setting up the environment
 
 You need to have a cross-compiler environment setup to build the tools
-and target binaries. This environment be sourced from several places
+and target binaries. This environment can be sourced from several places
 such as
 
 - https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
@@ -36,8 +36,8 @@ cross-compiler and tools are already in your =PATH=.
           
           # extra tooling
           export PATH=${PETALINUX}/tools/xsct/bin:${PATH}
-          export PATH=${HOME}/syfala/boot/u-boot-xlnx/tools:${PATH}
-          export PATH=${HOME}/syfala/boot/dtc:${PATH}
+          export PATH=${DEV_PATH}/u-boot-xlnx/tools:${PATH}
+          export PATH=${DEV_PATH}/dtc:${PATH}
           export PS1="[X]$PS1"
   fi
 #+end_src
@@ -57,16 +57,17 @@ github page. Building u-boot requires both =flex= and =bison= tools.
 Compiling u-boot is straightforward. We use the main project branch
 with the current HEAD.
 
-In recent revisions (exact modification not verified) the
+In recent u-boot revisions (exact modification not verified) the
 configuration of interest is called =xilinx_zynq_virt_defconfig=.
 Previous/older revisions were using a configuration named
-=zynq_zybo_z7_defconfig=).
+=zynq_zybo_z7_defconfig=.
 
 Configurations can be found in =u-boot-xlnx/configs/=.
 
 Some Xilinx notes are available in =doc/board/xilinx/zynq.rst=.
 
-** compiling HEAD (June 2022)
+** compiling u-boot (June 2022)
+
 #+begin_src sh
   $ git clone https://github.com/Xilinx/u-boot-xlnx
   $ cd u-boot-xlnx
@@ -75,11 +76,17 @@ Some Xilinx notes are available in =doc/board/xilinx/zynq.rst=.
   $ make
 #+end_src
 
+Outside source tree builds can be set using the =KBUILD_OUTPUT= variable.
+
 ** using a specific older revision
+
+For older revisions (2018.x), the configuration name must
+be set to =zynq_zybo_z7_defconfig=.
+
 #+begin_src sh
   git clone https://github.com/Xilinx/u-boot-xlnx
   cd u-boot-xlnx
-  git checkout 195c620e348891ca2d90c759781413f2adb3f748
+  git checkout [...x...]
   make zynq_zybo_z7_defconfig
   make
   #+end_src
@@ -90,7 +97,7 @@ Once compiled, binaries and files of interest are
 - =spl/boot.bin=
 - =u-boot.img=
 - =u-boot.dtb=    
-  
+
 * Linux kernel build
 
 A modified linux kernel source tree is also available on github at
@@ -115,7 +122,7 @@ be used safely.
   =OF_FPGA_REGION= and =FPGA_BRIDGE= activated.
 
   Final compilation stages require =mkimage= which can be found in
-  your distribution ( =u-boot-tools= package) or in the source tree
+  your distribution (=u-boot-tools= package) or in the source tree
   presented in the previous section on compiling =u-boot=.
 
 #+BEGIN_SRC sh
@@ -137,6 +144,21 @@ be used safely.
 
   Some Xilinx notes on device trees are available from Xilinx
   https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842279/Build+Device+Tree+Blob
+
+** Out-of source tree builds and custum configs
+  If you want to experiment and build a specific configuration
+  outside the source-tree the following steps are available:
+
+#+begin_src sh
+  $ cd linux-xilinx
+  $ make ARCH=arm O=../buiddir xilinx_zynq_defconfig
+  $ cd ../builddir
+  $ make ARCH=arm menuconfig
+  $ make ARCH=arm UIMAGE_LOADADDR=0x8000 uImage
+#+end_src
+
+  A custom configuration has to be made to include the =SSM2603= driver
+  and enable Alsa control of the audio driver.
 
 * Device-tree and XSA file
 

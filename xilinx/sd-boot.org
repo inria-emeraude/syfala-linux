@@ -4,7 +4,7 @@
 
 Booting from an SD card requires several steps.
 - media preparation
-- software configuration and copying files on media  
+- software configuration and copying files on media
 - hardware configuration
   
 * bootable sd card preparation

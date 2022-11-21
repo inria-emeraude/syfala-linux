@@ -8,20 +8,44 @@
 		reg = <0x0 0x40000000>;
 	};
 
-       aliases {
+        aliases {
                 ethernet0 = &gem0;
                 serial0 = &uart1;
                 i2c1 = "/amba/i2c@e0005000";
         };
 
-	chosen {
+        chosen {
 		bootargs = "earlycon uio_pdrv_genirq.of_id=generic-uio root=/dev/mmcblk0p2 rootfstype=ext4 rw rootwait";
 	};
-	
+
+        reserved-memory {
+                #address-cells = <1>;
+                #size-cells = <1>;
+                ranges;
+
+                reserved: buffer@0x38000000 {
+                       no-map;
+                       reg = <0x38000000 0x08000000>;
+                };
+        };
+
+        reserved-driver@0 {
+                compatible = "xlnx,reserved-memory";
+                memory-region = <&reserved>;
+        };
+
 };
 
 &sdhci0 {
         status = "okay";
+};
+
+&i2c0 {
+        status = "okay";
+        ssm2602: ssm2602@1a {
+                compatible = "adi,ssm2602";
+                reg = <0x1a>;
+        };
 };
 
 &i2c1 {
@@ -39,7 +63,7 @@
         };
 };
 
-&faust_v6_0 {
+&syfala {
         compatible = "generic-uio";
 };
 

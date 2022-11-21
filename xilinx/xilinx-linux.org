@@ -251,9 +251,12 @@ be used safely.
   
   The makefile contain several rules to build a =dtb= file. The process
   involves mainly 3 steps:
-  - build a base =dts= file =system-top.dts= : =make dts XSA_FILE=<Path to XSA FILE>.xsa=
-  - add local modifications : =make include_dtsi DTSI_FILE=zynq-zybo-syfala.dtsi=
-  - compile to a =dtb=:  make compile
+
+  |---+--------------------------------------+---------------------------------------------------|
+  | 1 | build a base =dts= file =system-top.dts= | =make dts XSA_FILE=<Path to XSA FILE>.xsa=          |
+  | 2 | add local modifications              | =make include_dtsi DTSI_FILE=zynq-zybo-syfala.dtsi= |
+  | 3 | compile to a =dtb=                     | =make compile=                                      |
+  |---+--------------------------------------+---------------------------------------------------|
 
   The important file is the final =dtb= file:
   =my_dts/system-top.dtb=. This file can be copied on the SD card
